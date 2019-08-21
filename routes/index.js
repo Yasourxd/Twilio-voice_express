@@ -49,6 +49,9 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
         case 'control_textbox':
           submissions[subText] = req.body.SpeechResult;
           break;
+        case 'control_textarea':
+          submissions[subText] = req.body.SpeechResult;
+          break;
         case 'control_rating':
             submissions[subText] = req.body.Digits;
       }
@@ -152,6 +155,14 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                     finishOnKey: "#"
                   }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                   break;
+              case 'control_textarea':
+                twiml.gather({
+                  action: twLink + req.params.formID + "/" + r[getKey(r, lengthR, (parseInt(orderID) + 1))].order + "/" + _submissionID,
+                  method: "POST",
+                  input: "speech",
+                  finishOnKey: "#"
+                }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                break;
               case 'control_rating':
                   var sayTwiml = r[getKey(r, lengthR, (parseInt(orderID) + 1))].text + ": Press " + 
                   r[getKey(r, lengthR, (parseInt(orderID) + 1))].scaleFrom + " for min and Press " + 
@@ -214,6 +225,14 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                     finishOnKey: "#"
                   }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                   break;
+              case 'control_textarea':
+                twiml.gather({
+                  action: twLink + req.params.formID + "/" + r[getKey(r, lengthR, (parseInt(orderID) + 1))].order + "/" + _submissionID,
+                  method: "POST",
+                  input: "speech",
+                  finishOnKey: "#"
+                }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                break;
               case 'control_rating':
                   var sayTwiml = r[getKey(r, lengthR, (parseInt(orderID) + 1))].text + ": Press " + 
                   r[getKey(r, lengthR, (parseInt(orderID) + 1))].scaleFrom + " for min and Press " + 
@@ -300,6 +319,14 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
           }).say({voice: 'alice'}, sayTwiml);
           break;
         case 'control_textbox':
+          twiml.gather({
+            action: twLink + req.params.formID + "/" + r[getKey(r, lengthR, (parseInt(orderID) + 1))].order,
+            method: "POST",
+            input: "speech dtmf",
+            finishOnKey: "#"
+          }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+          break;
+        case 'control_textarea':
           twiml.gather({
             action: twLink + req.params.formID + "/" + r[getKey(r, lengthR, (parseInt(orderID) + 1))].order,
             method: "POST",
