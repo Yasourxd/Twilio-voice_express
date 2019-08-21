@@ -80,6 +80,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
               }
             }
           }
+
           console.log(preDataKeys);
 
           for(var i=0;i<preDataKeys.length;i++){
@@ -114,7 +115,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
           // Is this last question? or ask next one...
           if(getKey(r, lengthR, (parseInt(orderID) + 1)) == -1){
             console.log("hangup")
-            twiml.say("Have a nice day!");
+            twiml.say({voice: 'alice'},"Have a nice day!");
             twiml.hangup();
           }else{
             console.log("type:", r[getKey(r, lengthR, orderID)].type);
@@ -126,7 +127,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                   method: "POST",
                   input: "speech dtmf",
                   finishOnKey: "#"
-                }).say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                 break;
               case 'control_radio':
                 console.log("buraya gidiyor");
@@ -135,13 +136,13 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                 for(var i=0;i<questOptions.length;i++){
                   sayTwiml += "Press " + i + " for " + questOptions[i] + ", ";
                 }
-                twiml.say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                twiml.say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                 twiml.gather({
                   action: twLink + req.params.formID + "/" + r[getKey(r, lengthR, (parseInt(orderID) + 1))].order + "/" + _submissionID,
                   method: "POST",
                   input: "speech dtmf",
                   finishOnKey: "#"
-                }).say(sayTwiml);
+                }).say({voice: 'alice'}, sayTwiml);
                 break;
               case 'control_textbox':
                   twiml.gather({
@@ -149,7 +150,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                     method: "POST",
                     input: "speech",
                     finishOnKey: "#"
-                  }).say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                  }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                   break;
               case 'control_rating':
                   var sayTwiml = r[getKey(r, lengthR, (parseInt(orderID) + 1))].text + ": Press " + 
@@ -160,10 +161,10 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                     method: "POST",
                     input: "speech dtmf",
                     finishOnKey: "#"
-                  }).say(sayTwiml);
+                  }).say({voice: 'alice'}, sayTwiml);
                   break;
               default:
-                twiml.say("error!!!!!!!");
+                twiml.say({voice: 'alice'}, "error!!!!!!!");
             }
           }
           res.type('text/xml');
@@ -178,7 +179,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
           // Is this last question? or ask next one...
           if(getKey(r, lengthR, (parseInt(orderID) + 1)) == -1){
             console.log("hangup")
-            twiml.say("Have a nice day!");
+            twiml.say({voice: 'alice'}, "Have a nice day!");
             twiml.hangup();
           }else{
             console.log("type:", r[getKey(r, lengthR, orderID)].type);
@@ -189,7 +190,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                   method: "POST",
                   input: "speech dtmf",
                   finishOnKey: "#"
-                }).say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                 break;
               case 'control_radio':
                 var questOptions = (r[getKey(r, lengthR, (parseInt(orderID) + 1))].options).split('|');
@@ -203,7 +204,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                   method: "POST",
                   input: "speech dtmf",
                   finishOnKey: "#"
-                }).say(sayTwiml);
+                }).say({voice: 'alice'}, sayTwiml);
                 break;
               case 'control_textbox':
                   twiml.gather({
@@ -211,7 +212,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                     method: "POST",
                     input: "speech dtmf",
                     finishOnKey: "#"
-                  }).say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+                  }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
                   break;
               case 'control_rating':
                   var sayTwiml = r[getKey(r, lengthR, (parseInt(orderID) + 1))].text + ": Press " + 
@@ -222,7 +223,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
                     method: "POST",
                     input: "speech dtmf",
                     finishOnKey: "#"
-                  }).say(sayTwiml);
+                  }).say({voice: 'alice'}, sayTwiml);
                   break;
             }
           }
@@ -254,14 +255,26 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
   }else{
     // False case
 
-    
-
-
     //Twiml question
     jf.getFormQuestions(req.params.formID)
     .then(function(r){
       var lengthR = Object.keys(r);
       lengthR = lengthR[lengthR.length-1];
+
+      //Initial conversation
+      twiml.say({voice: 'Polly.Salli'},"Welcome to Jotform voice call service.");
+      if(orderID == 1){
+        for(var i=1;i<=lengthR;i++){
+          if(r[i]){
+            if(r[i].type == 'control_head'){
+              var twimlSay = "We have a" +  r[i].text + "for you. Please answer the questions.";
+              twiml.say({voice:'Polly.Salli'},twimlSay);
+            }
+          }
+        }
+        twiml.say("Let's get the questions.")
+      }
+
       console.log("type:", r[getKey(r, lengthR, orderID)].type);
       switch(r[getKey(r, lengthR, orderID)].type){
         case 'control_number':
@@ -270,7 +283,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             method: "POST",
             input: "speech dtmf",
             finishOnKey: "#"
-          }).say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+          }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
           break;
         case 'control_radio':
           var questOptions = (r[getKey(r, lengthR, orderID)].options).split('|');
@@ -284,7 +297,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             method: "POST",
             input: "speech dtmf",
             finishOnKey: "#"
-          }).say(sayTwiml);
+          }).say({voice: 'alice'}, sayTwiml);
           break;
         case 'control_textbox':
           twiml.gather({
@@ -292,7 +305,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             method: "POST",
             input: "speech dtmf",
             finishOnKey: "#"
-          }).say(r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
+          }).say({voice: 'alice'}, r[getKey(r, lengthR, (parseInt(orderID) + 1))].text);
           break;
         case 'control_rating':
             var sayTwiml = r[getKey(r, lengthR, (parseInt(orderID) + 1))].text + ": Press " + 
@@ -303,7 +316,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
               method: "POST",
               input: "speech dtmf",
               finishOnKey: "#"
-            }).say(sayTwiml);
+            }).say({voice: 'alice'}, sayTwiml);
             break;
       }
 
