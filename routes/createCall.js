@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var VoiceResponse = require('twilio').twiml.VoiceResponse;
 var fs = require('fs');
+var axios = require('axios');
 
 //Twili Voice Call Data import
 const accountSid = require('../env2').accountSid;
@@ -44,23 +45,22 @@ router.post('/:formID',function(req,res,next){
     if(!contactList[0]){
         console.log("call is done!")
     }else{
-       // Create Call
-        // client.calls
-        // .create({
-        // url:twLink + req.params.formID,
-        // to: contactList[0].PHONE,
-        // from: agent,
-        // })
-        // .then(call => console.log(call.sid)) 
+        console.log("Link: ",twLink + req.params.formID)
+        //Create Call
+        client.calls
+        .create({
+        url:twLink + req.params.formID,
+        to: '+905437155319',
+        from: agent,
+        })
+        .then(call => {
+            console.log(call.sid);
+            let json = JSON.stringify(call);
+            // fs.writeFileSync('callConfig.json', json, 'utf8', () => console.log('callConfig is ok.'));
+            // axios.get(`http://localhost:3636/addcall/In%20progress/${contactList[0].ID}/1/${call.sid}`)
+
+        })
     }
-    console.log("phone  number", contactList[0])
-
-    
-
-
-    res.type('text/html');
-    res.send("ok");
-    
 })
 
 

@@ -3,6 +3,7 @@ var router = express.Router();
 var VoiceResponse = require('twilio').twiml.VoiceResponse;
 var jf = require('jotform');
 var fs = require('fs');
+var axios = require('axios');
 
 //Twili Voice Call Data import
 const accountSid = require('../env2').accountSid;
@@ -61,6 +62,12 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
       if(firstSubmission){
         jf.createFormSubmission(req.params.formID, submissions)
         .then(function(s){
+
+          let callConfigRawData = fs.readFileSync('callConfig.json');
+          let callConfig = JSON.parse(callConfigRawData);
+          // axios.get(`http://localhost:3636/updatecall/${callConfig.sid}/In%20progress/${s.submissionID}`)
+
+
           console.log(s);
           console.log("subbb:", s.submissionID);
           _submissionID = s.submissionID;
@@ -96,16 +103,16 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
               let rawData = fs.readFileSync('contactList.json');
               let contactList = JSON.parse(rawData);
 
-              fullName.first =  contactList[0].FNAME;
-              fullName.last = contactList[0].LNAME;
+              fullName.first =  "Elly";
+              fullName.last = "Smith";
               preSubmissions[preText] = fullName;
             }
             if(r[preDataKeys[i]].type == 'control_phone'){
               preText = 'submission[' + r[preDataKeys[i]].qid + "]";
               var phoneNo = {}
 
-              phoneNo.area = contactList[0].PHONE.slice(1,4);
-              phoneNo.phone = contactList[0].PHONE.slice(4);
+              phoneNo.area = "543";
+              phoneNo.phone = "3739429";
 
               preSubmissions[preText] = phoneNo;
             }
@@ -123,6 +130,11 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             console.log("hangup")
             twiml.say({voice: 'alice'},"Have a nice day!");
             twiml.hangup();
+
+            let callConfigRawData = fs.readFileSync('callConfig.json');
+            let callConfig = JSON.parse(callConfigRawData);
+            // axios.get(`http://localhost:3636/updatecall/${callConfig.sid}/Success`)
+
           }else{
             console.log("type:", r[getKey(r, lengthR, orderID)].type);
             console.log(r[getKey(r, lengthR, (parseInt(orderID) + 1))].type)
@@ -287,8 +299,8 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
       let rawData = fs.readFileSync('contactList.json');
       let contactList = JSON.parse(rawData);
 
-      var FNAME = contactList[0].FNAME;
-      var LNAME = contactList[0].LNAME;
+      var FNAME = 'Elly';
+      var LNAME = 'Smith';
       var brand = require('../env2').brand;
       var questCount = 0;
 
