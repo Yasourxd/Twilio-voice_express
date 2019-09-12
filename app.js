@@ -3,10 +3,13 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors');
 
 var indexRouter = require('./routes/index');
+var callRouter = require('./routes/createCall')
 
 var app = express();
+app.use(cors());
 
 //Twili Voice Call Data import
 const accountSid = require('./env2').accountSid;
@@ -27,7 +30,9 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/createcall',callRouter);
 app.use('/', indexRouter);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -45,13 +50,5 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-// Create Call
-client.calls
-  .create({
-    url:twLink + "92293453650964",
-    to: phoneNumber,
-    from: agent,
-  })
-  .then(call => console.log(call.sid))
 
 module.exports = app;

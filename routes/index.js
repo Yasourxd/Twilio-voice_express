@@ -1,7 +1,8 @@
 var express = require('express');
 var router = express.Router();
-const VoiceResponse = require('twilio').twiml.VoiceResponse;
-const jf = require('jotform');
+var VoiceResponse = require('twilio').twiml.VoiceResponse;
+var jf = require('jotform');
+var fs = require('fs');
 
 //Twili Voice Call Data import
 const accountSid = require('../env2').accountSid;
@@ -18,14 +19,13 @@ jf.options({
 });
 
 router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
-  console.log("body", req.body);
   // Variables
   const twiml = new VoiceResponse();
   var _submissionID = req.params.submissionID;
   var firstSubmission = req.params.submissionID ? false : true;
   var orderID = req.params.orderID ? req.params.orderID : 1;
   
-  // Checking user input for submission
+  // Checking unser input for submission
   if(req.body.Digits || req.body.SpeechResult){
     console.log("done");
     /* True case */
@@ -93,16 +93,19 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
               console.log(preText);
               var fullName = {}
 
-              fullName.first =  require("../env2").phoneDict[1].FNAME;
-              fullName.last = require("../env2").phoneDict[1].LNAME;
+              let rawData = fs.readFileSync('contactList.json');
+              let contactList = JSON.parse(rawData);
+
+              fullName.first =  contactList[0].FNAME;
+              fullName.last = contactList[0].LNAME;
               preSubmissions[preText] = fullName;
             }
             if(r[preDataKeys[i]].type == 'control_phone'){
               preText = 'submission[' + r[preDataKeys[i]].qid + "]";
               var phoneNo = {}
 
-              phoneNo.area = require("../env2").phoneDict[1].PHONE.slice(1,4);
-              phoneNo.phone = require("../env2").phoneDict[1].PHONE.slice(4);
+              phoneNo.area = contactList[0].PHONE.slice(1,4);
+              phoneNo.phone = contactList[0].PHONE.slice(4);
 
               preSubmissions[preText] = phoneNo;
             }
@@ -281,19 +284,37 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
       lengthR = lengthR[lengthR.length-1];
 
       //Initial conversation
-      twiml.say({voice: 'Polly.Salli'},"Welcome to Jotform voice call service.");
+      let rawData = fs.readFileSync('contactList.json');
+      let contactList = JSON.parse(rawData);
+
+      var FNAME = contactList[0].FNAME;
+      var LNAME = contactList[0].LNAME;
+      var brand = require('../env2').brand;
+      var questCount = 0;
+
+      for(var i=0;i<=lengthR;i++){
+        let ignores = ['control_head', 'control_button','control_fullname', 'control_phone'];
+        if(r[i]){
+          if(ignores.includes(r[i].type)){
+            questCount++;
+          }
+        }
+      }
+
       if(orderID == 1){
         for(var i=1;i<=lengthR;i++){
           if(r[i]){
             if(r[i].type == 'control_head'){
-              var twimlSay = "We have a" +  r[i].text + "for you. Please answer the questions.";
-              twiml.say({voice:'Polly.Salli'},twimlSay);
+              var twimlSay = "Hello " + FNAME + " " + LNAME + 
+                ", Welcoome to Jotform Voice Call Service. We are calling you on behalf of " + brand
+                + ' to fill out ' + r[i].text + ". We have " + questCount + " questions. Please answer the questions carefully."
+              twiml.say({voice:'Polly.Salli'}, twimlSay);
             }
           }
         }
-        twiml.say("Let's get the questions.")
       }
 
+      //First Question
       console.log("type:", r[getKey(r, lengthR, orderID)].type);
       switch(r[getKey(r, lengthR, orderID)].type){
         case 'control_number':
@@ -370,63 +391,5 @@ function getKey(r, lengthR, order){
   }
   return getKey(r, lengthR, ++order);
 }
-
-//Get pre submission data as an array
-function getPreSubData(r){
-  
-  return preDataKeys;
-}
-
-/*
-router.get('/:questID?/:submisID?', function(req, res, next) {
-  const twiml = new VoiceResponse();
-  //console.log(req);
-  console.log(req.body);
-  console.log(req.params);
-  jf.getFormQuestions('92202918011951')
-  .then(function(r){
-
-    const lengthR = Object.keys(r).length;
-    if (!req.params.submisID && !req.params.questID){
-      twiml.say("Thanks for your contribution!");
-      twiml.gather({
-        action: "/2",
-        method: "GET",
-        numDigits: "1",
-        input: "dtmf"
-      }).say(r[1].text);
-    }
-    else if(!req.params.submisID){
-
-      
-
-      twiml.gather({
-        action: "/" + (req.params.questID + 1) +"/" + "54686435",
-        method: "GET",
-        numDigits: "1",
-        input: "dtmf"
-      }).say(r[req.params.questID].text);
-    }
-    else if((lengthR+1) != req.params.questID){
-
-      
-      twiml.gather({
-        action: "/"+ req.params.questID + "/" + req.params.submisID,
-        method: "GET",
-        numDigits: "1",
-        input: "dtmf"
-      }).say(r[req.params.questID].text);
-    }
-    else{
-      twiml.say("Have a nice day!");
-      twiml.hangup();
-    }
-    
-    res.type('text/xml');
-    res.send(twiml.toString());
-  })
-  
-});
-*/
 
 module.exports = router;
