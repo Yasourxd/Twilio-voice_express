@@ -21,6 +21,7 @@ jf.options({
 
 router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
   // Variables
+  console.log("body ",req.body.Digits)
   const twiml = new VoiceResponse();
   var _submissionID = req.params.submissionID;
   var firstSubmission = req.params.submissionID ? false : true;
@@ -63,9 +64,9 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
         jf.createFormSubmission(req.params.formID, submissions)
         .then(function(s){
 
-          let callConfigRawData = fs.readFileSync('callConfig.json');
-          let callConfig = JSON.parse(callConfigRawData);
-          // axios.get(`http://localhost:3636/updatecall/${callConfig.sid}/In%20progress/${s.submissionID}`)
+          // let callConfigRawData = fs.readFile('callConfig.json');
+          // let callConfig = JSON.parse(callConfigRawData);
+          // axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/In%20progress/${s.submissionID}`)
 
 
           console.log(s);
@@ -100,8 +101,8 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
               console.log(preText);
               var fullName = {}
 
-              let rawData = fs.readFileSync('contactList.json');
-              let contactList = JSON.parse(rawData);
+              // let rawData = fs.readFile('contactList.json');
+              // let contactList = JSON.parse(rawData);
 
               fullName.first =  "Elly";
               fullName.last = "Smith";
@@ -131,9 +132,9 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             twiml.say({voice: 'alice'},"Have a nice day!");
             twiml.hangup();
 
-            let callConfigRawData = fs.readFileSync('callConfig.json');
-            let callConfig = JSON.parse(callConfigRawData);
-            // axios.get(`http://localhost:3636/updatecall/${callConfig.sid}/Success`)
+            // let callConfigRawData = fs.readFileSync('callConfig.json');
+            // let callConfig = JSON.parse(callConfigRawData);
+            // axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/Success`)
 
           }else{
             console.log("type:", r[getKey(r, lengthR, orderID)].type);
@@ -296,8 +297,8 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
       lengthR = lengthR[lengthR.length-1];
 
       //Initial conversation
-      let rawData = fs.readFileSync('contactList.json');
-      let contactList = JSON.parse(rawData);
+      // let rawData = fs.readFileSync('contactList.json');
+      // let contactList = JSON.parse(rawData);
 
       var FNAME = 'Elly';
       var LNAME = 'Smith';

@@ -4,12 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors');
+var bodyParser = require('body-parser');
 
 var indexRouter = require('./routes/index');
 var callRouter = require('./routes/createCall')
 
 var app = express();
 app.use(cors());
+app.use(bodyParser.text());
 
 //Twili Voice Call Data import
 const accountSid = require('./env2').accountSid;
