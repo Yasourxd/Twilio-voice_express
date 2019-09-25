@@ -53,9 +53,9 @@ router.post('/:formID',function(req,res,next){
         })
         .then(call => {
             console.log(call.sid);
-            // let json = JSON.stringify(call);
-            // fs.writeFile('callConfig.json', json, 'utf8', () => console.log('callConfig is ok.'));
-            // axios.post(`http://localhost:3636/addcall/In%20progress/${contactList[0].ID}/1/${call.sid}`)
+            let json = JSON.stringify(call);
+            fs.writeFile('callConfig.json', json, 'utf8', () => console.log('callConfig is ok.'));
+            axios.post(`http://localhost:3636/addcall/In%20progress/${contactList.formNumber[0].ID}/1/${call.sid}`)
         })
     res.send("ok");
     // console.log(contactList);

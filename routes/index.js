@@ -64,9 +64,9 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
         jf.createFormSubmission(req.params.formID, submissions)
         .then(function(s){
 
-          // let callConfigRawData = fs.readFile('callConfig.json');
-          // let callConfig = JSON.parse(callConfigRawData);
-          // axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/In%20progress/${s.submissionID}`)
+          let callConfigRawData = fs.readFileSync('callConfig.json');
+          let callConfig = JSON.parse(callConfigRawData);
+          axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/In%20progress/${s.submissionID}`)
 
 
           console.log(s);
@@ -132,9 +132,9 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             twiml.say({voice: 'alice'},"Have a nice day!");
             twiml.hangup();
 
-            // let callConfigRawData = fs.readFileSync('callConfig.json');
-            // let callConfig = JSON.parse(callConfigRawData);
-            // axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/Success`)
+            let callConfigRawData = fs.readFileSync('callConfig.json');
+            let callConfig = JSON.parse(callConfigRawData);
+            axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/Success`)
 
           }else{
             console.log("type:", r[getKey(r, lengthR, orderID)].type);
@@ -208,6 +208,10 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
             console.log("hangup")
             twiml.say({voice: 'alice'}, "Have a nice day!");
             twiml.hangup();
+
+            let callConfigRawData = fs.readFileSync('callConfig.json');
+            let callConfig = JSON.parse(callConfigRawData);
+            axios.post(`http://localhost:3636/updatecall/${callConfig.sid}/Success`)
           }else{
             console.log("type:", r[getKey(r, lengthR, orderID)].type);
             switch(r[getKey(r, lengthR, (parseInt(orderID) + 1))].type){
