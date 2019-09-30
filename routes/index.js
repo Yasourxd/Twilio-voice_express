@@ -101,19 +101,19 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
               console.log(preText);
               var fullName = {}
 
-              // let rawData = fs.readFile('contactList.json');
-              // let contactList = JSON.parse(rawData);
+              let rawData = fs.readFile('contactList.json');
+              let contactList = JSON.parse(rawData);
 
-              fullName.first =  "Elly";
-              fullName.last = "Smith";
+              fullName.first =  contactList.formNumber[0].FNAME;
+              fullName.last = contactList.formNumber[0].LNAME;
               preSubmissions[preText] = fullName;
             }
             if(r[preDataKeys[i]].type == 'control_phone'){
               preText = 'submission[' + r[preDataKeys[i]].qid + "]";
               var phoneNo = {}
 
-              phoneNo.area = "543";
-              phoneNo.phone = "3739429";
+              phoneNo.area = "545";
+              phoneNo.phone = "6720612";
 
               preSubmissions[preText] = phoneNo;
             }
@@ -301,12 +301,11 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
       lengthR = lengthR[lengthR.length-1];
 
       //Initial conversation
-      // let rawData = fs.readFileSync('contactList.json');
-      // let contactList = JSON.parse(rawData);
+      let rawData = fs.readFileSync('contactList.json');
+      let contactList = JSON.parse(rawData);
 
-      var FNAME = 'Elly';
-      var LNAME = 'Smith';
-      var brand = require('../env2').brand;
+      var FNAME = contactList.formNumber[0].FNAME;
+      var LNAME = contactList.formNumber[0].LNAME;
       var questCount = 0;
 
       for(var i=0;i<=lengthR;i++){
@@ -323,7 +322,7 @@ router.post('/:formID/:orderID?/:submissionID?',function(req,res,next){
           if(r[i]){
             if(r[i].type == 'control_head'){
               var twimlSay = "Hello " + FNAME + " " + LNAME + 
-                ", Welcoome to Jotform Voice Call Service. We are calling you on behalf of " + brand
+                ", Welcoome to Jotform Voice Call Service. We are calling you"
                 + ' to fill out ' + r[i].text + ". We have " + questCount + " questions. Please answer the questions carefully."
               twiml.say({voice:'Polly.Salli'}, twimlSay);
             }
